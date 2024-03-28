@@ -23,10 +23,10 @@ python3 -m venv <env-name>
 ```bash
 # Linux
 source <env-name>/bin/activate
-```
+
 # Windows
 <env-name>/Scripts/activate.bat
-
+```
 # Install dependencies
 
 ```python
