@@ -272,5 +272,7 @@ Mar 27 12:31:23 ubuntu-s-1vcpu-2gb-sfo3-01 systemd[1]: Started nginx.service - A
 ```
 
 Your Flask application is now successfully deployed in a production environment with Nginx and Gunicorn.
-new Your API will be http://your-ip-address:5000 for following all these steps as it is.
-new For further services or configurations, please visit the official websites of Flask, Nginx, and Gunicorn.
+
+Your API will be http://your-ip-address:5000 for following all these steps as it is.
+
+For further services or configurations, please visit the official websites of Flask, Nginx, and Gunicorn.
