@@ -271,6 +271,6 @@ vcpu-2gb-sfo3-01 nginx[161725]: 2024/03/27 12:31:23 [warn] 161725#161725:>
 Mar 27 12:31:23 ubuntu-s-1vcpu-2gb-sfo3-01 systemd[1]: Started nginx.service - A high performance w>
 ```
 
-Your Flask application is now successfully deployed in a production environment with Nginx and Gunicorn. 
-Your API will be http://<your-ip-address>:5000 for following all these steps as it is.
+Your Flask application is now successfully deployed in a production environment with Nginx and Gunicorn. \n
+Your API will be http://your-ip-address:5000 for following all these steps as it is.\n
 For further services or configurations, please visit the official websites of Flask, Nginx, and Gunicorn.
