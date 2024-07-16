@@ -5,20 +5,23 @@ This guide provides step-by-step instructions to deploy a Flask application in a
 
 ## Installation and Setup
 
-# Install Required Dependencies
+### Install Required Dependencies
 
 ```bash
 <server command> install python3-venv
 <server command> install nginx
 ```
-# Create Project Directory and Python Virtual Environment
+
+### Create Project Directory and Python Virtual Environment
 
 ```bash
 mkdir ~/project
 cd ~/project
 python3 -m venv <env-name>
 ```
-# Activate Virtual Environment
+`<env-name>` is the name of the virtual environment.
+
+### Activate Virtual Environment
 
 ```bash
 # Linux
@@ -27,21 +30,25 @@ source <env-name>/bin/activate
 # Windows
 <env-name>/Scripts/activate.bat
 ```
-# Install dependencies
 
-```python
+### Install Dependencies
+
+```bash
 pip install wheel gunicorn flask
 ```
-# Next create python file main.py
+
+### Create Python File main.py
 
 ```bash
 nano ~/project/main.py
 ```
-# Add the following code
+
+### Add the Following Code
 
 ```python
 from flask import Flask
 app = Flask(__name__)
+
 @app.route('/')
 def welcome():
     return 'Welcome to your first API'
@@ -49,15 +56,17 @@ def welcome():
 if __name__=='__main__':
     app.run(host='0.0.0.0')
 ```
-# Save and close the file
-# To verify run with this command
-# Run it with run option in your ide or use command line
+
+### Save and Close the File
+
+### Verify by Running the Application
 
 ```bash    
 cd ~/project
 python3 main.py
 ```
-# If everything goes well you will see something like the following
+
+### Expected Output
 
 ```bash
 * Serving Flask app 'main'
@@ -67,15 +76,16 @@ python3 main.py
 * Running on http://192.168.0.2:5000/ 
 (Press CTRL+C to quit)
 ```
-# Press CTRL+C to close the application
-# Next we will create the WSGI entry Point to serve the application via Gunicorn
 
-#Create wsgi file
+### Press CTRL+C to Close the Application
+
+### Create the WSGI Entry Point
 
 ```bash
 nano ~/project/wsgi.py
 ```
-# Add the following lines
+
+### Add the Following Lines
 
 ```python
 from main import app
@@ -83,13 +93,15 @@ from main import app
 if __name__=='__main__':
    app.run()
 ```
-# For your required or other services Check wsgi official website
-# Run the following command in your terminal
+
+### Run the Following Command in Your Terminal
 
 ```bash 
-cd ~/project/gunicorn --bind 0.0.0.0:5000 wsgi:app
+cd ~/project
+gunicorn --bind 0.0.0.0:5000 wsgi:app
 ```
-# If all goes well you will see some thing like
+
+### Expected Output
 
 ```bash
 [2024-03-28 10:37:15 +0000] [23362] [INFO] Starting gunicorn <version>
@@ -97,56 +109,68 @@ cd ~/project/gunicorn --bind 0.0.0.0:5000 wsgi:app
 [2024-03-28 10:37:15 +0000] [23362] [INFO] Using worker: sync
 [2024-03-28 10:37:15 +0000] [23364] [INFO] Booting worker with pid: 23364
 ```
-# Press CTRL+C to close the application
-# Deactivate the virtual Environment
+
+### Press CTRL+C to Close the Application
+
+### Deactivate the Virtual Environment
 
 ```bash
 deactivate
 ```
-# Next we will create systemd services file for flask application
+
+### Create systemd Service File for Flask Application
 
 ```bash
 nano /etc/systemd/system/<name>.service
 ```
-#Add the following lines
+
+### Add the Following Lines
 
 ```plaintext
 [Unit]
 Description= <describe it>
 After=network.target
+
 [Service]
 User=root
 Group=www-data
 WorkingDirectory=/root/project
 Environment="PATH=/root/project/<env-name>/bin"
 ExecStart=/root/project/<env-name>/bin/gunicorn --bind 0.0.0.0:5000 wsgi:app
+
 [Install]
 WantedBy=multi-user.target
 ```
-# Save and close the file
-# Set the ownershiP and permission to flask project
+
+### Save and Close the File
+
+### Set Ownership and Permission to Flask Project
 
 ```bash
-chown -R root:ww-data /root/project
+chown -R root:www-data /root/project
 chmod -R 775 /root/project
 ```
-# Next reload the systemd daemon with
+
+### Reload the systemd Daemon
 
 ```bash
 systemctl daemon-reload
 ```
-# Next start the <name>.service and enable it with start at system reboot
+
+### Start and Enable the Service
 
 ```bash
-systemctl start flask
-systemctl enable flask
+systemctl start <name>
+systemctl enable <name>
 ```
-# Next verify the status
+
+### Verify the Status
 
 ```bash
-systemctl status flask
+systemctl status <name>
 ```
-# The output will be something like
+
+### Expected Output
 
 ```bash
 ● flask.service - Gunicorn instance to serve Flask
@@ -157,8 +181,8 @@ systemctl status flask
      Memory: 405.3M
         CPU: 19.547s
      CGroup: /system.slice/flask.service
-             ├─164345 /root/baby_cry/baby_env/bin/python3 /root/baby_cry/baby_env/bin/gunicorn --bi>
-             └─164348 /root/baby_cry/baby_env/bin/python3 /root/baby_cry/baby_env/bin/gunicorn --bi>
+             ├─164345 /root/project/<env-name>/bin/python3 /root/project/<env-name>/bin/gunicorn --bi>
+             └─164348 /root/project/<env-name>/bin/python3 /root/project/<env-name>/bin/gunicorn --bi>
 
 Mar 27 22:45:09 ubuntu-s-1vcpu-2gb-sfo3-01 gunicorn[164348]: [2024-03-27 22:45:09 +0000] [164348] [>
 Mar 27 22:45:12 ubuntu-s-1vcpu-2gb-sfo3-01 gunicorn[164348]: [2024-03-27 22:45:12 +0000] [164348] [>
@@ -171,13 +195,16 @@ Mar 27 22:45:50 ubuntu-s-1vcpu-2gb-sfo3-01 gunicorn[164348]: [2024-03-27 22:45:5
 Mar 27 22:46:13 ubuntu-s-1vcpu-2gb-sfo3-01 gunicorn[164348]: [2024-03-27 22:46:13 +0000] [164348] [>
 Mar 27 22:46:29 ubuntu-s-1vcpu-2gb-sfo3-01 gunicorn[164348]: [2024-03-27 22:46:29 +0000] [164348] [>
 ```
-# Next configure Nginx as a Reverse Proxy for flask Application
-# Create an Nginx virtual host configuration file with port 80.
+
+### Configure Nginx as a Reverse Proxy
+
+### Create an Nginx Virtual Host Configuration File
 
 ```bash
 nano /etc/nginx/conf.d/nginx.conf
 ```
-# Add the following lines
+
+### Add the Following Lines
 
 ```plaintext
 server {
@@ -185,33 +212,43 @@ server {
         server_name _;
         location / {
                 include proxy_params;
-                proxy_pass http://172.0.0.1:5000/;
+                proxy_pass http://127.0.0.1:5000/;
                 proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-                proxy_set_header X-Forwarded_proto $scheme;
+                proxy_set_header X-Forwarded-Proto $scheme;
                 proxy_set_header X-Forwarded-Host $host;
-                proxy_set_header X_Forwarded-Prefix /;
-
+                proxy_set_header X-Forwarded-Prefix /;
         }
 }
 ```
-# Save and close it
-# Check for any syntax error
+
+### Save and Close the File
+
+### Check for Syntax Errors
 
 ```bash
 nginx -t
 ```
-# You will have to see this
+
+### Expected Output
 
 ```bash
 nginx: the configuration file /etc/nginx/nginx.conf syntax is ok
 nginx: configuration file /etc/nginx/nginx.conf test is successful
 ```
-# Finally restart the nginx
+
+### Restart Nginx
 
 ```bash
 systemctl restart nginx
 ```
-# Check status to see like this
+
+### Check Nginx Status
+
+```bash
+systemctl status nginx
+```
+
+### Expected Output
 
 ```bash
 ● nginx.service - A high performance web server and a reverse proxy server
@@ -228,11 +265,12 @@ systemctl restart nginx
 
 Mar 27 12:31:23 ubuntu-s-1vcpu-2gb-sfo3-01 systemd[1]: Starting nginx.service - A high performance >
 Mar 27 12:31:23 ubuntu-s-1vcpu-2gb-sfo3-01 nginx[161724]: 2024/03/27 12:31:23 [warn] 161724#161724:>
-Mar 27 12:31:23 ubuntu-s-1vcpu-2gb-sfo3-01 nginx[161724]: 2024/03/27 12:31:23 [warn] 161724#161724:>
-Mar 27 12:31:23 ubuntu-s-1vcpu-2gb-sfo3-01 nginx[161725]: 2024/03/27 12:31:23 [warn] 161725#161725:>
-Mar 27 12:31:23 ubuntu-s-1vcpu-2gb-sfo3-01 nginx[161725]: 2024/03/27 12:31:23 [warn] 161725#161725:>
+Mar 27 12:31:23 ubuntu-s-1
+
+vcpu-2gb-sfo3-01 nginx[161725]: 2024/03/27 12:31:23 [warn] 161725#161725:>
 Mar 27 12:31:23 ubuntu-s-1vcpu-2gb-sfo3-01 systemd[1]: Started nginx.service - A high performance w>
 ```
-# Your Flask application is now successfully deployed in a production environment with Nginx and Gunicorn.
-# For further services or configurations, please visit the official websites of Flask, Nginx, and Gunicorn.
 
+Your Flask application is now successfully deployed in a production environment with Nginx and Gunicorn. 
+Your API will be http://<your-ip-address>:5000 for following all these steps as it is.
+For further services or configurations, please visit the official websites of Flask, Nginx, and Gunicorn.
